@@ -32,7 +32,7 @@ jobs:
           cd backups/BBDD
           ls -tp piezas_backup_*.sql | grep -v '/$' | tail -n +3 | xargs -r rm -f
 
-      - name: Confirmar cambios de backups y hacer push
+      - name: Confirmar cambios de backups y hacer push a rama backups
         env:
           TOKEN: ${{ secrets.GH_PAT }}
           REPO: ${{ github.repository }}
@@ -40,10 +40,14 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
+          git fetch origin
+          git checkout -B backups
+
           git add backups/BBDD/piezas_backup_*.sql
           git commit -m "🔁 Backup semanal automático" || echo "Sin cambios"
 
           git remote remove origin
           git remote add origin https://x-access-token:${TOKEN}@github.com/${REPO}.git
 
-          git push origin HEAD:main
+          git push origin backups
+
