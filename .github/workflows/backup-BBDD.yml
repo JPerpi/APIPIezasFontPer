@@ -40,5 +40,7 @@ jobs:
           git config user.email "github-actions@github.com"
           git add backups/BBDD/piezas_backup_*.sql
           git commit -m "🔁 Backup semanal automático" || echo "Sin cambios"
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
-          git push origin HEAD:${{ github.ref_name }}
+          git remote remove origin
+          git remote add origin https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git branch
+          git push origin HEAD:main
