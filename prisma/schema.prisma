@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model tareas {
+  id             Int           @id @default(autoincrement())
+  nombre_cliente String?
+  direccion      String?
+  telefono       String?
+  piezastarea    piezastarea[]
+}
+
+model pieza {
+  id             Int           @id @default(autoincrement())
+  nombre         String        @db.VarChar(100)
+  material       String?       @db.VarChar(50)
+  conexion       String?       @db.VarChar(50)
+  medida_nominal String?       @db.VarChar(50)
+  tipo_control   String?       @db.VarChar(50)
+  uso            String?       @db.VarChar(100)
+  instalacion    String?       @db.VarChar(100)
+  dimensiones    String?       @db.VarChar(100)
+  tipo_termo     String?       @db.VarChar(50)
+  capacidad      String?       @db.VarChar(50)
+  alimentacion   String?       @db.VarChar(50)
+  potencia       String?       @db.VarChar(50)
+  caudal         String?       @db.VarChar(50)
+  tipo_id        Int?
+  tipopieza      tipopieza?    @relation(fields: [tipo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  piezastarea    piezastarea[]
+}
+
+model piezastarea {
+  id       Int     @id @default(autoincrement())
+  tarea_id Int?
+  pieza_id Int?
+  cantidad Decimal @db.Decimal
+  pieza    pieza?  @relation(fields: [pieza_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tareas   tareas? @relation(fields: [tarea_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model tipopieza {
+  id     Int     @id @default(autoincrement())
+  nombre String  @unique @db.VarChar(50)
+  pieza  pieza[]
+}
