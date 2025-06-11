@@ -2,8 +2,8 @@ name: Backup semanal Railway (rotativo)
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # Lunes a las 2:00 UTC+2
-  workflow_dispatch:       # También se puede lanzar manualmente
+    - cron: '0 0 * * 1'  # Lunes a las 02:00 hora peninsular (España)
+  workflow_dispatch:       # Permite lanzarlo manualmente
 
 jobs:
   backup:
@@ -32,7 +32,7 @@ jobs:
           cd backups/BBDD
           ls -tp piezas_backup_*.sql | grep -v '/$' | tail -n +3 | xargs -r rm -f
 
-      - name: Confirmar cambios de backups
+      - name: Confirmar cambios de backups y hacer push
         env:
           TOKEN: ${{ secrets.GH_PAT }}
         run: |
