@@ -1,9 +1,9 @@
-name: Backup semanal Railway (rotativo)
+name: Backup semanal Railway (artifacts controlados)
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # Lunes a las 02:00 hora peninsular (España)
-  workflow_dispatch:       # Permite lanzarlo manualmente
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
 
 jobs:
   backup:
@@ -13,40 +13,33 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v3
 
-      - name: Instalar PostgreSQL client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Instalar herramientas necesarias
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          sudo apt-get install -y gh
 
       - name: Generar nombre de backup
         id: fecha
         run: echo "fecha=$(date +%d%m%Y)" >> $GITHUB_OUTPUT
 
-      - name: Hacer backup desde Railway
+      - name: Crear backup desde Railway
         run: |
-          mkdir -p backups/BBDD
-          pg_dump "$DATABASE_URL" --no-owner --no-privileges --encoding=UTF8 > backups/BBDD/piezas_backup_${{ steps.fecha.outputs.fecha }}.sql
+          mkdir -p temp_backup
+          pg_dump "$DATABASE_URL" --no-owner --no-privileges --encoding=UTF8 > temp_backup/piezas_backup_${{ steps.fecha.outputs.fecha }}.sql
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Mantener solo los 2 backups más recientes (excepto el archivo base)
-        run: |
-          cd backups/BBDD
-          ls -tp piezas_backup_*.sql | grep -v '/$' | tail -n +3 | xargs -r rm -f
+      - name: Subir backup como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: piezas_backup_${{ steps.fecha.outputs.fecha }}
+          path: temp_backup/piezas_backup_${{ steps.fecha.outputs.fecha }}.sql
 
-      - name: Confirmar cambios de backups y hacer push a rama backups
+      - name: Eliminar artifacts antiguos (dejar solo 2 últimos)
         env:
-          TOKEN: ${{ secrets.GH_PAT }}
-          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-          git fetch origin
-          git checkout -B backups
-
-          git add backups/BBDD/piezas_backup_*.sql
-          git commit -m "🔁 Backup semanal automático" || echo "Sin cambios"
-
-          git remote remove origin
-          git remote add origin https://x-access-token:${TOKEN}@github.com/${REPO}.git
-
-          git push origin backups
+          gh api repos/${{ github.repository }}/actions/artifacts | \
+            jq -r '.artifacts | sort_by(.created_at) | reverse | .[2:][] | .id' | \
+            xargs -n 1 -I {} gh api --method DELETE repos/${{ github.repository }}/actions/artifacts/{}
