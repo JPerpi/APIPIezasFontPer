@@ -2,7 +2,7 @@ const prisma = require('./prisma');
 
 // Obtener todas las relaciones pieza–tarea
 const getAllPiezasTarea = () =>
-  prisma.piezasTarea.findMany({
+  prisma.piezastarea.findMany({
     include: {
       pieza: true,
       tarea: true,
@@ -11,8 +11,8 @@ const getAllPiezasTarea = () =>
 
 // Obtener las piezas asociadas a una tarea
 const getPiezasByTareaId = (tareaId) =>
-  prisma.piezasTarea.findMany({
-    where: { tareaId: parseInt(tareaId) },
+  prisma.piezastarea.findMany({
+    where: { tarea_id: parseInt(tareaId) },
     include: {
       pieza: true,
     },
@@ -20,18 +20,18 @@ const getPiezasByTareaId = (tareaId) =>
 
 // Añadir una pieza a una tarea
 const addPiezaTarea = (data) =>
-  prisma.piezasTarea.create({ data });
+  prisma.piezastarea.create({ data });
 
 // Actualizar solo la cantidad
 const updateCantidad = (id, cantidad) =>
-  prisma.piezasTarea.update({
+  prisma.piezastarea.update({
     where: { id: parseInt(id) },
     data: { cantidad },
   });
 
 // Eliminar una pieza de una tarea
 const deletePiezaTarea = (id) =>
-  prisma.piezasTarea.delete({
+  prisma.piezastarea.delete({
     where: { id: parseInt(id) },
   });
 

@@ -1,12 +1,18 @@
 const tareaModel = require('../models/tareaModel');
 
 const getAllTareas =  async (req, res) => {
-    try {
-        const tareas = await tareaModel.getAllTareas();
-        res.json(tareas);
-    } catch (err) {
-        res.status(500).json({ error: 'Error al obtener las tareas.' });
+     try {
+    const tareas = await tareaModel.getAllTareas();
+
+    if (!tareas || tareas.length === 0) {
+      return res.status(200).json({ message: 'No hay tareas registradas.' });
     }
+
+    res.json(tareas);
+  } catch (err) {
+    console.error('❌ Error en getAllTareas:', err);
+    res.status(500).json({ error: 'Error al obtener las tareas.', detail: err.message });
+  }
 };
 
 const getTareaById =  async (req, res) => {

@@ -3,21 +3,31 @@ const piezasTareaModel = require('../models/piezasTareaModel');
 // Obtener todas las relaciones pieza–tarea
 const getAllPiezasTarea = async (req, res) => {
   try {
-    const asociaciones = await piezasTareaModel.getAllPiezasTarea();
-    res.json(asociaciones);
+    const piezasTarea = await piezasTareaModel.getAllPiezasTarea();
+
+    if (!piezasTarea || piezasTarea.length === 0) {
+      return res.status(200).json({ message: 'No hay piezas asociadas a tareas todavía.' });
+    }
+
+    res.json(piezasTarea);
   } catch (err) {
-    res.status(500).json({ error: 'Error al obtener las piezas de tareas' });
+    console.error('❌ Error en getAllPiezasTarea:', err);
+    res.status(500).json({ error: 'Error al obtener las piezas de tareas', detail: err.message });
   }
 };
 
 // Obtener todas las piezas de una tarea concreta
 const getPiezasByTareaId = async (req, res) => {
-  const { tareaId } = req.params;
+   const { tareaId } = req.params;
   try {
-    const piezas = await piezasTareaModel.getPiezasByTareaId(tareaId);
+    const piezas = await piezasTareaModel.getPiezasByTareaId(parseInt(tareaId));
+    if (!piezas || piezas.length === 0) {
+      return res.status(200).json({ message: `No hay piezas asociadas a la tarea con ID ${tareaId}.` });
+    }
     res.json(piezas);
   } catch (err) {
-    res.status(500).json({ error: 'Error al obtener piezas de la tarea' });
+    console.error('❌ Error en getPiezasByTareaId:', err);
+    res.status(500).json({ error: 'Error al obtener piezas de la tarea', detail: err.message });
   }
 };
 

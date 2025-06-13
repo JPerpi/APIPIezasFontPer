@@ -5,12 +5,13 @@ const getAllPiezas = async (req, res) => {
         const piezas =  await piezaModel.getAllPiezas();
         res.json(piezas);
     } catch (err) {
-        res.status(500).json({ error: 'Error al obtener las piezas.'});
-    }
+    console.error('❌ Error en getAllPiezas:', err); // 👈 añade esto
+    res.status(500).json({ error: 'Error al obtener las piezas.', detail: err.message });
+  }
 };
 
-const getPiezasById =  async (req, res) => {
-    const { id } = req.query;
+const getPiezaById =  async (req, res) => {
+    const id = parseInt(req.params.id);
     try {
         const pieza= await piezaModel.getPiezaById(id);
         if (!pieza) return res.status(404).json({ error: 'Pieza no encontrada.'});
@@ -71,7 +72,7 @@ const eliminarPieza = async (req,res) => {
 
 module.exports = {
     getAllPiezas,
-    getPiezasById,
+    getPiezaById,
     getPiezasByMaterial,
     getPiezasByTipo,
     crearPieza,

@@ -82,7 +82,9 @@
     "yocto-queue": "^0.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node src/app.js",
+    "prisma:generate": "npx prisma generate"
   },
   "repository": {
     "type": "git",

@@ -2,28 +2,28 @@ const prisma = require('./prisma');
 
 // Obtener todas las tareas (sin incluir piezas)
 const getAllTareas = () =>
-  prisma.tarea.findMany();
+  prisma.tareas.findMany();
 
 // Obtener una tarea por ID (sin incluir piezas)
 const getTareaById = (id) =>
-  prisma.tarea.findUnique({
+  prisma.tareas.findUnique({
     where: { id: parseInt(id) },
   });
 
 // Crear nueva tarea
 const createTarea = (data) =>
-  prisma.tarea.create({ data });
+  prisma.tareas.create({ data });
 
 // Actualizar tarea existente
 const updateTarea = (id, data) =>
-  prisma.tarea.update({
+  prisma.tareas.update({
     where: { id: parseInt(id) },
     data,
   });
 
 // Eliminar tarea
 const deleteTarea = (id) =>
-  prisma.tarea.delete({
+  prisma.tareas.delete({
     where: { id: parseInt(id) },
   });
 

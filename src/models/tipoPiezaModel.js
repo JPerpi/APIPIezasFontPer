@@ -1,52 +1,27 @@
-const tipoPiezaModel = require('../models/tipoPiezaModel');
+// src/models/tipoPiezaModel.js
+const prisma = require('./prisma'); // o la ruta que uses
 
-const getAllTiposPieza = async (req, res) => {
-  try {
-    const tipos = await tipoPiezaModel.getAllTiposPieza();
-    res.json(tipos);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al obtener los tipos de pieza' });
-  }
+const getAllTiposPieza = () => {
+  return prisma.tipopieza.findMany(); // 👈 asegúrate de que el modelo se llama así en Prisma
 };
 
-const getTipoPiezaById = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const tipo = await tipoPiezaModel.getTipoPiezaById(id);
-    if (!tipo) return res.status(404).json({ error: 'Tipo de pieza no encontrado' });
-    res.json(tipo);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al obtener el tipo de pieza' });
-  }
+const getTipoPiezaById = (id) => {
+  return prisma.tipopieza.findUnique({ where: { id: parseInt(id) } });
 };
 
-const createTipoPieza = async (req, res) => {
-  try {
-    const nuevo = await tipoPiezaModel.createTipoPieza(req.body);
-    res.status(201).json(nuevo);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al crear el tipo de pieza' });
-  }
+const createTipoPieza = (data) => {
+  return prisma.tipopieza.create({ data });
 };
 
-const updateTipoPieza = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const actualizado = await tipoPiezaModel.updateTipoPieza(id, req.body);
-    res.json(actualizado);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar el tipo de pieza' });
-  }
+const updateTipoPieza = (id, data) => {
+  return prisma.tipopieza.update({
+    where: { id: parseInt(id) },
+    data,
+  });
 };
 
-const deleteTipoPieza = async (req, res) => {
-  const { id } = req.params;
-  try {
-    await tipoPiezaModel.deleteTipoPieza(id);
-    res.status(204).send();
-  } catch (err) {
-    res.status(500).json({ error: 'Error al eliminar el tipo de pieza' });
-  }
+const deleteTipoPieza = (id) => {
+  return prisma.tipopieza.delete({ where: { id: parseInt(id) } });
 };
 
 module.exports = {

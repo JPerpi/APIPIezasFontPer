@@ -3,21 +3,31 @@ const tipoPiezaModel = require('../models/tipoPiezaModel');
 const getAllTiposPieza = async (req, res) => {
     try {
         const tipos = await tipoPiezaModel.getAllTiposPieza();
-        res.json(tipos);
-    } catch (err) {
-        res.status(500).json({ error: 'Error al obtener los tiposd e pieza.'});
+       if (!tipos || tipos.length === 0) {
+      return res.status(200).json({ message: 'No hay tipos de pieza registrados.' });
     }
+
+    res.json(tipos);
+  } catch (err) {
+    console.error('❌ Error en getAllTiposPieza:', err);
+    res.status(500).json({ error: 'Error al obtener los tipos de pieza.', detail: err.message });
+  }
 };
 
 const getTipoPiezaById = async (req, res) => {
-    const { id } =req.params;
-    try {
-        const tipo = await tipoPiezaModel.getTipoPiezaById(id);
-        if (!tipo) return res.status(404).json({error: 'Tipo de pieza no encontrado.'});
-        res.json(tipo);
-    } catch (err) {
-        res.status(500).json({ error: 'Error al obtener el tipo de pieza.'});
+     const { id } = req.params;
+  try {
+    const tipo = await tipoPiezaModel.getTipoPiezaById(id);
+
+    if (!tipo) {
+      return res.status(404).json({ message: `No existe un tipo de pieza con ID ${id}` });
     }
+
+    res.json(tipo);
+  } catch (err) {
+    console.error('❌ Error en getTipoPiezaById:', err);
+    res.status(500).json({ error: 'Error al obtener el tipo de pieza', detail: err.message });
+  }
 };
 
 // Crear un nuevo tipo de pieza
